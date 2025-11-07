@@ -1,0 +1,23 @@
+# Server
+flask
+flask-cors
+
+# Core RAG & Agent framework
+langchain
+langchain-community
+langchain-openai
+
+# Vector Database
+chromadb
+
+# Text/Code Splitting
+langchain-text-splitters
+
+# Embedding Model
+sentence-transformers
+
+# Git Loader
+GitPython
+
+# Environment variables
+python-dotenv
