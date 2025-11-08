@@ -1,11 +1,11 @@
 [build]
   # This tells Netlify to 'cd frontend' before doing anything
   base    = "frontend"
-  # This is the command to build your React app
+  # This is the command to build your React app (unchanged)
   command = "npm run build"
-  # This is where Vite puts the final website
-  publish = "frontend/dist"
-  # This tells Netlify where your serverless functions are (relative to root)
+  # This is the FIX: The site is in 'dist', relative to the 'base'
+  publish = "dist"
+  # This is where your functions are (relative to the root)
   functions = "netlify/functions/"
 
 [functions]
