@@ -3,7 +3,12 @@ import axios from 'axios';
 import './App.css'; // We'll add this next
 
 function App() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    {
+        sender: 'bot',
+        text: 'Hello! I am ready to answer questions about the LangChain codebase.'
+    }
+  ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -60,9 +65,13 @@ function App() {
           </div>
         ))}
         {isLoading && (
-          <div className="message bot">
-            <p><i>Thinking...</i></p>
-          </div>
+        <div className="message bot">
+            <div className="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
         )}
       </div>
 
