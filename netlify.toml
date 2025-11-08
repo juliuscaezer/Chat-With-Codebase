@@ -1,22 +1,17 @@
 [build]
-  # Tell Netlify to 'cd frontend' first
   base    = "frontend"
-  
-  # The build command (relative to 'base')
   command = "npm run build"
-  
-  # The final, published site (relative to 'base')
   publish = "dist"
-  
-  # Where the functions live (relative to the *root*)
   functions = "netlify/functions/"
 
+# This is the corrected block
 [functions]
-  # Tell Netlify's Python runtime where to find our requirements
-  python_requirements = "backend/requirements.txt"
+  # This tells Netlify *which function* to apply settings to
+  "chat" = {
+    python_requirements = "backend/requirements.txt"
+  }
 
 [[redirects]]
-  # Our API proxy rule
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
