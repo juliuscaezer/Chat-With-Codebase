@@ -1,0 +1,11 @@
+[build]
+  # This tells Netlify where our serverless functions live
+  functions = "netlify/functions/"
+
+[[redirects]]
+  # This "redirects" a simple URL to our complex function URL.
+  # This means our React app can just call "/api/chat"
+  # and Netlify will know to run the "chat.py" function.
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
