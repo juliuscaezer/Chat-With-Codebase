@@ -6,6 +6,7 @@ flask-cors
 langchain
 langchain-community
 langchain-openai
+langchain-huggingface
 
 # Vector Database
 chromadb
@@ -21,3 +22,5 @@ GitPython
 
 # Environment variables
 python-dotenv
+
+einops
