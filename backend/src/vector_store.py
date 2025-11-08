@@ -70,7 +70,7 @@ def create_vector_store():
     # 6. Apply Test Mode slice
     if TEST_MODE:
         print(f"\n*** TEST MODE: Slicing chunks from {len(chunks)} to 100. ***\n")
-        chunks = chunks[:100]
+        chunks = chunks[:500]
 
     # 7. Initialize the embedding model (same as before)
     model_kwargs = {'trust_remote_code': True}

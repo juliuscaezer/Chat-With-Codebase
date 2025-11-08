@@ -66,7 +66,7 @@ handler = Mangum(app)
 # ... (at the very bottom of the file) ...
 
 # --- LOCAL TEST BLOCK ---
-if __name__ == "__main__":
+"""if __name__ == "__main__":
     try:
         from src.config import GOOGLE_API_KEY
         if not GOOGLE_API_KEY:
@@ -76,4 +76,4 @@ if __name__ == "__main__":
             print("--- Access this server at http://127.0.0.1:5001 ---")
             app.run(debug=True, port=5001)
     except ImportError:
-        print("\nError: Could not import config.")
+        print("\nError: Could not import config.")"""
