@@ -25,3 +25,4 @@ GitPython
 python-dotenv
 
 einops
+mangum
