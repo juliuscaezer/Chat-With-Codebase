@@ -1,6 +1,7 @@
 # Server
-flask
-flask-cors
+pinecone-client
+langchain-pinecone
+langchain-google-genai
 
 # Core RAG & Agent framework
 langchain
