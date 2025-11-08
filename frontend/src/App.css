@@ -1,0 +1,93 @@
+/* Basic App Layout */
+.App {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+  text-align: center;
+}
+
+/* Chat Window */
+.chat-window {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Message Bubbles */
+.message {
+  max-width: 70%;
+  padding: 10px 15px;
+  border-radius: 18px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.message.user {
+  background-color: #007bff;
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 5px;
+}
+
+.message.bot {
+  background-color: #e9e9eb;
+  color: #333;
+  align-self: flex-start;
+  border-bottom-left-radius: 5px;
+}
+
+.message.bot i {
+  color: #555;
+}
+
+/* Input Area */
+.input-area {
+  display: flex;
+  padding: 20px;
+  border-top: 1px solid #ccc;
+  background-color: #fff;
+}
+
+.input-area input {
+  flex-grow: 1;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+.input-area input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.input-area button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.input-area button:disabled {
+  background-color: #a0a0a0;
+  cursor: not-allowed;
+}
+
+.input-area button:hover:not(:disabled) {
+  background-color: #0056b3;
+}

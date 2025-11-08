@@ -29,8 +29,8 @@ except ImportError:
         return None
 
 app = Flask(__name__)
-CORS(app) 
-
+# Allow requests ONLY from our React dev server
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
 try:
     rag_chain = create_rag_chain()
     print("RAG chain loaded successfully.")
@@ -63,19 +63,17 @@ def chat():
 handler = Mangum(app)
 
 # --- LOCAL TEST BLOCK ---
+# ... (at the very bottom of the file) ...
+
+# --- LOCAL TEST BLOCK ---
 if __name__ == "__main__":
     try:
-        # Since 'backend' is on the path, this import is now correct
         from src.config import GOOGLE_API_KEY
-
         if not GOOGLE_API_KEY:
             print("FATAL: GOOGLE_API_KEY not found in .env file.")
         else:
             print("\n--- RUNNING IN LOCAL TEST MODE ---")
             print("--- Access this server at http://127.0.0.1:5001 ---")
             app.run(debug=True, port=5001)
-            
     except ImportError:
         print("\nError: Could not import config.")
-        print("Please run this test from the 'backend' folder:")
-        print("Example: python ../netlify/functions/chat.py")
