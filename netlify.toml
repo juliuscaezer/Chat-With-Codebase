@@ -1,19 +1,22 @@
 [build]
-  # This tells Netlify to 'cd frontend' before doing anything
+  # Tell Netlify to 'cd frontend' first
   base    = "frontend"
-  # This is the command to build your React app (unchanged)
+  
+  # The build command (relative to 'base')
   command = "npm run build"
-  # This is the FIX: The site is in 'dist', relative to the 'base'
+  
+  # The final, published site (relative to 'base')
   publish = "dist"
-  # This is where your functions are (relative to the root)
+  
+  # Where the functions live (relative to the *root*)
   functions = "netlify/functions/"
 
 [functions]
-  # This tells Netlify's Python runtime where to find your dependencies
+  # Tell Netlify's Python runtime where to find our requirements
   python_requirements = "backend/requirements.txt"
 
 [[redirects]]
-  # This is our API proxy rule (unchanged)
+  # Our API proxy rule
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
