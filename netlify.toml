@@ -1,11 +1,19 @@
 [build]
-  # This tells Netlify where our serverless functions live
+  # This tells Netlify to 'cd frontend' before doing anything
+  base    = "frontend"
+  # This is the command to build your React app
+  command = "npm run build"
+  # This is where Vite puts the final website
+  publish = "frontend/dist"
+  # This tells Netlify where your serverless functions are (relative to root)
   functions = "netlify/functions/"
 
+[functions]
+  # This tells Netlify's Python runtime where to find your dependencies
+  python_requirements = "backend/requirements.txt"
+
 [[redirects]]
-  # This "redirects" a simple URL to our complex function URL.
-  # This means our React app can just call "/api/chat"
-  # and Netlify will know to run the "chat.py" function.
+  # This is our API proxy rule (unchanged)
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
