@@ -1,33 +1,33 @@
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 
-from src.config import OPENAI_API_KEY
-from src.vector_store import get_retriever
+from src.config import GOOGLE_API_KEY
+from src.vector_store import get_retriever # Pinecone Retriever 
+
 def create_rag_chain():
     """
-    Creates the main RAG chain for answering questions.
+    Creates the main RAG chain for answering questions using Google Gemini.
     """
-
-    # Load vector store from disk
+    
+    # 1. Get the retriever
+    # This now loads our PINECODE retriever
     retriever = get_retriever()
 
-    # Define the LLM 
-    # Change the LLM to Groq/Mistral
-    llm = ChatOpenAI(
-        api_key = OPENAI_API_KEY,
-        model = "gpt-3.5-turbo"
+    # 2. Define the LLM 
+    llm = ChatGoogleGenerativeAI(
+        google_api_key = GOOGLE_API_KEY,
+        model = "gemini-2.5-flash"
     )
 
     # 3. Define the Prompt Template
-    # This is where we "stuff" the context (the code chunks)
-    # in front of the user's question.
+    # This prompt is slightly tuned for Gemini
     template = """
     You are an expert software developer assistant.
-    Answer the user's question based ONLY on the following context of code snippets
-    and documentation. If the context does not contain the answer,
-    state clearly that you cannot answer from the provided information.
+    Answer the user's question based ONLY on the following context.
+    If the context does not contain the answer, state clearly that you cannot
+    find the answer in the provided context.
 
     CONTEXT:
     {context}
@@ -37,40 +37,47 @@ def create_rag_chain():
 
     ANSWER:
     """
-
+    
     prompt = ChatPromptTemplate.from_template(template)
 
-    def format_docs(docs):
-        # Function to combine all retrieved chunks 
-        return "\n\n".join(doc.page_content for doc in docs)
+    # 4. Build the RAG Chain (This logic is identical to before)
     
+    def format_docs(docs):
+        # A helper function to combine all the retrieved chunks
+        return "\n\n".join(doc.page_content for doc in docs)
+
     rag_chain = (
-        {"context":retriever | format_docs, "question": RunnablePassthrough()}
+        {"context": retriever | format_docs, "question": RunnablePassthrough()}
         | prompt
         | llm
         | StrOutputParser()
     )
-
+    
     return rag_chain
 
+# --- Test Block ---
 if __name__ == "__main__":
     """
     If you run this file directly (e.g., 'python -m src.rag_pipeline'),
-    it will execute this block.
+    it will test the full serverless RAG pipeline.
     """
-    print("Running RAG pipeline test...")
+    print("Running Serverless RAG pipeline test (Pinecone + Gemini)...")
     
-    # Make sure your .env file has your OPENAI_API_KEY
-    if not OPENAI_API_KEY:
-        print("Error: OPENAI_API_KEY not found. Please set it in your .env file.")
+    if not GOOGLE_API_KEY:
+        print("Error: GOOGLE_API_KEY not found. Please set it in your .env file.")
     else:
         chain = create_rag_chain()
         
         # Test with a question
-        question = "How is authentication handled in this repository?"
+        question = "What is the repository about?"
         print(f"Testing with question: '{question}'")
         
-        response = chain.invoke(question)
-        
-        print("\n--- RAG Response ---")
-        print(response)
+        try:
+            response = chain.invoke(question)
+            
+            print("\n--- RAG Response (Gemini) ---")
+            print(response)
+        except Exception as e:
+            print(f"\n--- An error occurred ---")
+            print(e)
+
