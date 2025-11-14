@@ -48,7 +48,7 @@ To run this project on your local machine, you will need to run the frontend and
 ### 1\. Clone the Repository
 
 ```bash
-git clone https://github.com/juliuscaezer/chat-with-codebase-pro.git
+git clone https://github.com/juliuscaezer/chat-with-codebase.git
 cd chat-with-codebase-pro
 ```
 
