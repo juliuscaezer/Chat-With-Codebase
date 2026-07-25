@@ -1,4 +1,7 @@
-# Server
+# Server (FastAPI for AWS Lambda)
+fastapi
+uvicorn
+mangum
 pinecone-client
 langchain-pinecone
 langchain-google-genai
@@ -24,5 +27,5 @@ GitPython
 # Environment variables
 python-dotenv
 
+# Utilities
 einops
-mangum

@@ -1,0 +1,17 @@
+# Use the official AWS Lambda Python 3.10 base image
+FROM public.ecr.aws/lambda/python:3.10
+
+# Copy the requirements file into the container
+COPY requirements.txt ${LAMBDA_TASK_ROOT}
+
+# Install dependencies
+# We use --no-cache-dir to keep the image size as small as possible
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy your source code (the src directory and chat.py) into the container
+COPY src/ ${LAMBDA_TASK_ROOT}/src/
+COPY src/chat.py ${LAMBDA_TASK_ROOT}/chat.py
+
+# Set the CMD to point to the Mangum handler we created in chat.py
+# Format: filename.handler_variable_name
+CMD [ "chat.handler" ]
