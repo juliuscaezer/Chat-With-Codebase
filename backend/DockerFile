@@ -1,17 +1,26 @@
-# Use the official AWS Lambda Python 3.10 base image
-FROM public.ecr.aws/lambda/python:3.10
+# Use the official AWS Lambda Python 3.12 base image
+FROM public.ecr.aws/lambda/python:3.12
 
-# Copy the requirements file into the container
+# 1. Install OS dependencies required by your packages
+RUN dnf update -y && dnf install -y gcc gcc-c++ make git
+
+# 2. Route Hugging Face model downloads to Lambda's writable directory
+ENV HF_HOME="/tmp/huggingface"
+
+# 3. Copy requirements
 COPY requirements.txt ${LAMBDA_TASK_ROOT}
 
-# Install dependencies
-# We use --no-cache-dir to keep the image size as small as possible
-RUN pip install --no-cache-dir -r requirements.txt
+# 4. Upgrade pip
+RUN pip install --upgrade pip
 
-# Copy your source code (the src directory and chat.py) into the container
+# 5. Install dependencies, forcing the lightweight CPU-only version of PyTorch
+RUN pip install --no-cache-dir \
+    --extra-index-url https://download.pytorch.org/whl/cpu \
+    -r requirements.txt
+
+# 6. Copy your application code
 COPY src/ ${LAMBDA_TASK_ROOT}/src/
 COPY src/chat.py ${LAMBDA_TASK_ROOT}/chat.py
 
-# Set the CMD to point to the Mangum handler we created in chat.py
-# Format: filename.handler_variable_name
+# 7. Point to the Mangum handler
 CMD [ "chat.handler" ]

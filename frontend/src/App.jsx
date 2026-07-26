@@ -14,7 +14,7 @@ function App() {
 
   // This is the API URL for our *local test server*
   // We'll update this one last time before we deploy.
-  const API_URL = 'http://127.0.0.1:5001/api/chat';; 
+  const API_URL = 'https://0k0d7odnk1.execute-api.us-east-1.amazonaws.com';
 
   const handleSend = async () => {
     if (input.trim() === '') return;

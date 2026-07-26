@@ -4,16 +4,13 @@ uvicorn
 mangum
 pinecone-client
 langchain-pinecone
-langchain-google-genai
 
 # Core RAG & Agent framework
 langchain
 langchain-community
-langchain-openai
 langchain-huggingface
+langchain-google-genai
 
-# Vector Database
-chromadb
 
 # Text/Code Splitting
 langchain-text-splitters
