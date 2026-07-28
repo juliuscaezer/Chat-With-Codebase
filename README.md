@@ -1,171 +1,155 @@
-# Chat with Codebase 
+# Chat with Codebase
 
-This is a full-stack, serverless RAG (Retrieval-Augmented Generation) application that allows you to ask natural language questions about a specific GitHub repository.
+A professional, full-stack RAG (Retrieval-Augmented Generation) application that lets you ask natural language questions about a specific GitHub repository. 
 
-It leverages a 100% serverless architecture to provide in-depth, context-aware answers about the repository.
+This project features a high-performance, containerized Python backend migrated to **FastAPI**, hosted serverlessly on **AWS Lambda** via **Docker & ECR**, and a fast **React (Vite)** frontend hosted on **Amazon S3**.
 
-## Features
+---
 
-  * **Conversational AI:** A clean, fast React-based chat interface.
-  * **Serverless RAG Pipeline:** A 100% serverless backend that runs on Netlify, ensuring scalable deployment.
-  * **Deep Code Awareness:** Ingests an entire codebase, splitting it semantically (by functions/classes) to provide accurate, context-aware answers.
-  * **Cloud-Native:** Uses Pinecone for persistent, cloud-based vector storage and Google Gemini for state-of-the-art text generation.
+## 🏗️ Architecture & Flow
 
-## Tech Stack
+```mermaid
+graph TD
+    User([User Browser]) <-->|React Frontend| S3[Amazon S3 Static Site]
+    User <-->|HTTPS / REST API| APIGW[Amazon API Gateway]
+    APIGW <-->|CORS / Request Integration| Lambda[AWS Lambda: chat-backend]
+    
+    subgraph Containerized AWS Lambda
+        direction LR
+        FastAPI[FastAPI + Mangum]
+        HuggingFace[Offline Hugging Face cache]
+    end
+    
+    Lambda --> FastAPI
+    FastAPI -->|Extract Embeddings| HuggingFace
+    FastAPI -->|Query Context| VectorDB[(Pinecone Serverless)]
+    FastAPI -->|Generate Response| Gemini[Google Gemini API]
+```
 
-This project is a "monorepo" with a separate frontend and backend.
+---
+
+## ✨ Features
+
+*   **Conversational AI:** A responsive React-based chat interface built on Vite.
+*   **Containerized FastAPI Backend:** Wrapped using `Mangum` to run serverlessly on AWS Lambda with minimal cold start latency.
+*   **Pre-baked Embedding Cache:** Hugging Face embeddings (`nomic-ai/nomic-embed-text-v1`) are baked directly into the Docker image, enabling **100% offline local embeddings** and eliminating run-time downloading overhead.
+*   **Deep Code Awareness:** Ingests and semantically splits codebases (by functions and classes) to supply pinpoint context to the LLM.
+*   **Serverless Vector Database:** Integrates with Pinecone Serverless for instant, cost-effective vector search.
+*   **State-of-the-Art LLM:** Powered by Google's `gemini-1.5-flash` via Google AI Studio for fast and intelligent responses.
+
+---
+
+## 🛠️ Tech Stack
 
 ### Frontend
-
-  * **Framework:** React (using Vite)
-  * **UI:** Plain CSS
-  * **API Client:** Axios
-  * **Host:** Netlify
+*   **Framework:** React (Vite)
+*   **Styling:** Vanilla CSS
+*   **API Client:** Axios
+*   **Hosting:** Amazon S3 (Static Website Hosting)
 
 ### Backend & RAG Pipeline
+*   **API Framework:** FastAPI + Uvicorn
+*   **Serverless Handler:** Mangum (for AWS Lambda compatibility)
+*   **Embedding Model:** `nomic-ai/nomic-embed-text-v1` (cached locally)
+*   **Vector DB:** Pinecone Serverless (Cloud)
+*   **LLM:** Google Gemini (`gemini-1.5-flash`)
+*   **Containerization:** Docker (`public.ecr.aws/lambda/python:3.12`)
+*   **Hosting:** AWS Lambda + Amazon ECR + Amazon API Gateway
 
-  * **API:** Python + Flask (run as a serverless function via `Mangum`)
-  * **LLM:** Google Gemini (`gemini-1.5-flash`)
-  * **Vector Database:** Pinecone (Serverless, Cloud-based)
-  * **Embedding Model:** `nomic-ai/nomic-embed-text-v1`
-  * **Data Handling:** LangChain
-  * **Host:** Netlify Functions
+---
 
-## Getting Started (Local Development)
-
-To run this project on your local machine, you will need to run the frontend and backend in two separate terminals.
+## 🚀 Getting Started (Local Development)
 
 ### Prerequisites
 
-  * [Node.js](https://nodejs.org/en)
-  * [Python 3.10+](https://www.python.org/)
-  * [Git](https://git-scm.com/)
-  * **Pinecone API Key:** Get one from [Pinecone](https://www.pinecone.io/)
-  * **Google API Key:** Get one from [Google AI Studio](https://aistudio.google.com/app/apikey)
+*   [Node.js](https://nodejs.org/en) (v16.0.0+)
+*   [Python 3.10+](https://www.python.org/)
+*   [Docker](https://www.docker.com/) (for building and testing containers)
+*   **Pinecone API Key:** Get one from [Pinecone](https://www.pinecone.io/)
+*   **Google API Key:** Get one from [Google AI Studio](https://aistudio.google.com/app/apikey)
 
------
+---
 
-### 1\. Clone the Repository
-
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/juliuscaezer/chat-with-codebase.git
-cd chat-with-codebase-pro
+cd chat-with-codebase
 ```
 
-### 2\. Configure Environment Variables
+### 2. Configure Environment Variables
+Create a `.env` file inside the `backend/` directory:
+```env
+PINECONE_API_KEY="YOUR_PINECONE_API_KEY"
+GOOGLE_API_KEY="YOUR_GOOGLE_AI_KEY"
+```
 
-1.  Navigate into the `backend/` folder.
-2.  Create a file named `.env`:
-    ```bash
-    # /backend/.env
-
-    PINECONE_API_KEY="YOUR_PINECONE_API_KEY"
-    GOOGLE_API_KEY="YOUR_GOOGLE_AI_KEY"
-    ```
-
-### 3\. Set Up the Backend
+### 3. Setup & Ingest Codebase Data
+Before running the server, load the target codebase data into your Pinecone vector database:
 
 ```bash
-# From the /backend folder
 cd backend
 
-# Create a virtual environment
-python -m venv venv
+# Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate  # Windows: .\venv\Scripts\activate
 
-# Activate it
-# Windows
-.\venv\Scripts\activate
-# Mac/Linux
-source venv/bin/activate
-
-# Install all Python dependencies
+# Install dependencies
 pip install -r requirements.txt
+
+# Run the ingestion script
+python3 -m src.vector_store
 ```
 
-### 4\. Set Up the Frontend
+### 4. Run the Development Servers
 
-```bash
-# From the root folder, go into the frontend
-cd ../frontend
+Open two terminals:
 
-# Install all Node modules
-npm install
-```
-
-### 5\. Run the Data Ingestion
-
-Before you can chat, you must load the codebase data into your Pinecone database.
-
-1.  Make sure you are in the `backend/` folder with your `(venv)` active.
-2.  Open `backend/src/vector_store.py` and set `TEST_MODE = True` (to ingest 500 chunks) or `False` (for the full 16,000+ chunks).
-3.  Run the ingestion script:
+*   **Terminal 1 (Backend API):**
     ```bash
-    # This will clone the repo, split the files, and upload
-    # all embeddings to Pinecone. This may take 10-15 minutes.
-    python -m src.vector_store
+    cd backend
+    source venv/bin/activate
+    python3 src/chat.py
+    # Runs on http://127.0.0.1:5001
     ```
 
-### 6\. Run the Project (Two-Terminal Mode)
-
-You are now ready to run the app.
-
-  * **Terminal 1 (Run the Backend API):**
-
+*   **Terminal 2 (Frontend UI):**
     ```bash
-    # Start from the /backend folder (with venv active)
-
-    # This runs our Netlify function as a local test server
-    python ../netlify/functions/chat.py
-
-    # You should see it running on http://127.0.0.1:5001
-    ```
-
-  * **Terminal 2 (Run the Frontend UI):**
-
-    ```bash
-    # Start from the /frontend folder
+    cd frontend
+    npm install
     npm run dev
-
-    # Your browser will open to http://localhost:5173
+    # Open http://localhost:5173 in your browser
     ```
 
-You can now use the app in your browser\!
+---
 
------
+## 📦 Containerization & AWS Deployment
 
-## Deployment
-
-This project is built to deploy **for free** on Netlify. This is one of the main reasons to keep the project serverless. Another recommended alternative for a server based version of this will be to use Flask combined with a vector database like ChromaDB instead of Pinecone (cloud storage) and a model like Llama which can be downloaded locally as a substitute for Gemini. However that will demand server based hosting facilities like AWS, Azure, etc. 
-
-### 1\. Final Code Prep
-
-Before pushing, make sure you have done the following:
-
-1.  **Clean `chat.py`:** Remove the `if __name__ == "__main__":` local test block from `netlify/functions/chat.py`.
-2.  **Fix `App.jsx` URL:** Change the `API_URL` variable in `frontend/src/App.jsx` to the relative path:
-    ```jsx
-    const API_URL = '/api/chat';
+### 1. Deploy the Backend (Docker & AWS Lambda)
+1.  **Build and Push Docker Image to ECR:**
+    ```bash
+    docker build -t chat-backend ./backend
+    docker tag chat-backend:latest YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/chat-backend:latest
+    docker push YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/chat-backend:latest
     ```
+2.  **Configure AWS Lambda:**
+    *   Create a Lambda function using your ECR container image.
+    *   Increase **Ephemeral Storage** to `1024 MB` (under Configuration -> General Configuration).
+    *   Add the following **Environment Variables**:
+        *   `GOOGLE_API_KEY`, `PINECONE_API_KEY`
+        *   `HF_HUB_OFFLINE=1`, `TRANSFORMERS_OFFLINE=1`, `HF_HOME=/var/task/hf_cache` (to run the embedded model offline).
+3.  **Setup API Gateway:**
+    *   Create an HTTP API in API Gateway routing to your Lambda function.
+    *   Enable **CORS** in API Gateway to allow requests from your frontend:
+        *   *Origins:* `*` (or your S3 URL)
+        *   *Headers:* `*`
+        *   *Methods:* `POST`, `OPTIONS`
 
-### 2\. Push to GitHub
-
-Commit all your changes and push them to your main branch.
-
-```bash
-git add .
-git commit -m "feat: Prepare for production deployment"
-git push origin main
-```
-
-### 3\. Deploy on Netlify
-
-1.  Log in to Netlify and connect your GitHub repository.
-2.  Netlify will automatically read your `netlify.toml` file and apply these settings:
-      * **Base directory:** `frontend`
-      * **Build command:** `npm run build`
-      * **Publish directory:** `frontend/dist`
-3.  **Add Environment Variables:** Go to **Site settings \> Build & deploy \> Environment** and add your two secret keys:
-      * `GOOGLE_API_KEY`: `AIzaSy...`
-      * `PINECONE_API_KEY`: `your-pinecone-key...`
-4.  Click **"Deploy site"**. Netlify will build your React app, set up your Python serverless function, and launch your site.
-
+### 2. Deploy the Frontend (Amazon S3)
+1.  Set the API Gateway URL as `API_URL` in `frontend/src/App.jsx`.
+2.  Build and deploy the static files to an S3 Bucket configured for static website hosting:
+    ```bash
+    cd frontend
+    npm run build
+    # Sync dist/ to your S3 bucket
+    aws s3 sync dist/ s3://YOUR-S3-BUCKET-NAME --acl public-read
+    ```
